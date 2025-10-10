@@ -5,10 +5,15 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const _loremText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
-const _style = TextStyle(
+const _headerStyle = TextStyle(
+  fontSize: 20,
+  fontWeight: FontWeight.w600,
+);
+const _loremTextStyle = TextStyle(
   fontSize: 40,
   fontWeight: FontWeight.bold,
 );
+const _headerSpacing = 20.0;
 const letterAnimationDuration = Duration(milliseconds: 500);
 const wordAnimationDuration = Duration(milliseconds: 1000);
 
@@ -35,25 +40,32 @@ class _HomeWidgetState extends State<HomeWidget> {
   int selectedValue = 0;
   final int length = 12;
   final GlobalKey<SpringTextState> springTextKey = GlobalKey<SpringTextState>();
-  final GlobalKey<ChimeBellTextState> chimbellTextKey =
-      GlobalKey<ChimeBellTextState>();
+  final GlobalKey<ChimeBellTextState> chimbellTextKey = GlobalKey<ChimeBellTextState>();
   final GlobalKey<ScaleTextState> scaleTextKey = GlobalKey<ScaleTextState>();
   final GlobalKey<BlurTextState> blurTextKey = GlobalKey<BlurTextState>();
   final GlobalKey<RotateTextState> rotateTextKey = GlobalKey<RotateTextState>();
-  final GlobalKey<RotateTextState> rotateTextAntiKey =
-      GlobalKey<RotateTextState>();
-  final GlobalKey<OffsetTextState> offsetTextTBKey =
-      GlobalKey<OffsetTextState>();
-  final GlobalKey<OffsetTextState> offsetTextBTKey =
-      GlobalKey<OffsetTextState>();
-  final GlobalKey<OffsetTextState> offsetTextAlternateTBKey =
-      GlobalKey<OffsetTextState>();
-  final GlobalKey<OffsetTextState> offsetTextLRKey =
-      GlobalKey<OffsetTextState>();
-  final GlobalKey<OffsetTextState> offsetTextRLKey =
-      GlobalKey<OffsetTextState>();
-  final GlobalKey<OffsetTextState> offsetTextAlternateLRKey =
-      GlobalKey<OffsetTextState>();
+  final GlobalKey<RotateTextState> rotateTextAntiKey = GlobalKey<RotateTextState>();
+  final GlobalKey<OffsetTextState> offsetTextTBKey = GlobalKey<OffsetTextState>();
+  final GlobalKey<OffsetTextState> offsetTextBTKey = GlobalKey<OffsetTextState>();
+  final GlobalKey<OffsetTextState> offsetTextAlternateTBKey = GlobalKey<OffsetTextState>();
+  final GlobalKey<OffsetTextState> offsetTextLRKey = GlobalKey<OffsetTextState>();
+  final GlobalKey<OffsetTextState> offsetTextRLKey = GlobalKey<OffsetTextState>();
+  final GlobalKey<OffsetTextState> offsetTextAlternateLRKey = GlobalKey<OffsetTextState>();
+  final animationNames = [
+    "Spring",
+    "Chimbell",
+    "Scale",
+    "Rotate",
+    "Rotate Anti Clockwise",
+    "Blur",
+    "Offset",
+    "Offset Bottom to Top",
+    "Offset Alternate",
+    "Offset Left to Right",
+    "Offset Right to Left",
+    "Offset Alternate Left Right",
+  ];
+
   @override
   void dispose() {
     letterController.dispose();
@@ -95,8 +107,8 @@ class _HomeWidgetState extends State<HomeWidget> {
     }
   }
 
-  int get currentLetterPage => letterController.page?.round() ?? 0;
-  int get currentWordPage => wordController.page?.round() ?? 0;
+  int currentLetterPage = 0;
+  int currentWordPage = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +122,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               onPressed: () => _launchUrl(
                 'https://pub.dev/packages/pretty_animated_text',
               ),
-              icon: ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.asset('assets/pub.png')),
+              icon: ClipRRect(borderRadius: BorderRadius.circular(50), child: Image.asset('assets/pub.png')),
             ),
             const SizedBox(height: 8),
             IconButton(
@@ -120,9 +130,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               onPressed: () => _launchUrl(
                 'https://github.com/YeLwinOo-Steve/pretty_animated_text',
               ),
-              icon: ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.asset('assets/github.png')),
+              icon: ClipRRect(borderRadius: BorderRadius.circular(50), child: Image.asset('assets/github.png')),
             ),
           ],
         ),
@@ -168,10 +176,18 @@ class _HomeWidgetState extends State<HomeWidget> {
           child: Column(
             children: [
               _tabs(),
+              const SizedBox(height: _headerSpacing),
+              Text(
+                animationNames[selectedValue == 0 ? currentLetterPage : currentWordPage],
+                style: _headerStyle,
+              ),
               if (selectedValue == 0) ...[
                 Expanded(
                   flex: 9,
                   child: PageView(
+                    onPageChanged: (index) {
+                      setState(() => currentLetterPage = index);
+                    },
                     controller: letterController,
                     children: const [
                       SpringDemo(),
@@ -206,6 +222,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                 Expanded(
                   flex: 9,
                   child: PageView(
+                    onPageChanged: (index) {
+                      setState(() => currentWordPage = index);
+                    },
                     controller: wordController,
                     children: const [
                       SpringDemo(
@@ -305,6 +324,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         // 11 => offsetTextAlternateLRKey.currentState?.pauseAnimation(),
         _ => () {},
       };
+
   void _restartAnimation(int page) => switch (page) {
         // 0 => springTextKey.currentState?.restartAnimation(),
         // 1 => chimbellTextKey.currentState?.restartAnimation(),
@@ -402,6 +422,7 @@ class ChimeBellDemo extends StatelessWidget {
   final AnimationType type;
   final Duration duration;
   final GlobalKey? chimbellTextKey;
+
   const ChimeBellDemo({
     super.key,
     this.chimbellTextKey,
@@ -417,7 +438,7 @@ class ChimeBellDemo extends StatelessWidget {
         text: _loremText,
         duration: duration,
         type: type,
-        textStyle: _style,
+        textStyle: _loremTextStyle,
       ),
     );
   }
@@ -427,6 +448,7 @@ class SpringDemo extends StatelessWidget {
   final AnimationType type;
   final GlobalKey? springTextKey;
   final Duration duration;
+
   const SpringDemo({
     super.key,
     this.springTextKey,
@@ -442,7 +464,7 @@ class SpringDemo extends StatelessWidget {
         text: _loremText,
         duration: duration,
         type: type,
-        textStyle: _style,
+        textStyle: _loremTextStyle,
       ),
     );
   }
@@ -452,6 +474,7 @@ class ScaleTextDemo extends StatelessWidget {
   final AnimationType type;
   final Duration duration;
   final GlobalKey? scaleTextKey;
+
   const ScaleTextDemo({
     super.key,
     this.scaleTextKey,
@@ -467,7 +490,7 @@ class ScaleTextDemo extends StatelessWidget {
         text: _loremText,
         duration: duration,
         type: type,
-        textStyle: _style,
+        textStyle: _loremTextStyle,
       ),
     );
   }
@@ -478,6 +501,7 @@ class RotateTextDemo extends StatelessWidget {
   final GlobalKey? rotateTextKey;
   final RotateAnimationType direction;
   final Duration duration;
+
   const RotateTextDemo({
     super.key,
     this.rotateTextKey,
@@ -495,7 +519,7 @@ class RotateTextDemo extends StatelessWidget {
         direction: direction,
         duration: duration,
         type: type,
-        textStyle: _style,
+        textStyle: _loremTextStyle,
       ),
     );
   }
@@ -505,6 +529,7 @@ class BlurTextDemo extends StatelessWidget {
   final AnimationType type;
   final Duration duration;
   final GlobalKey? blurTextKey;
+
   const BlurTextDemo({
     super.key,
     this.blurTextKey,
@@ -519,7 +544,7 @@ class BlurTextDemo extends StatelessWidget {
         type: type,
         duration: duration,
         text: _loremText,
-        textStyle: _style,
+        textStyle: _loremTextStyle,
         onPlay: () => print('Animation started'),
         onComplete: () => print('Animation completed'),
       ),
@@ -532,6 +557,7 @@ class OffsetTextDemo extends StatelessWidget {
   final AnimationType type;
   final SlideAnimationType slideType;
   final Duration duration;
+
   const OffsetTextDemo({
     super.key,
     this.offsetTextKey,
@@ -549,7 +575,7 @@ class OffsetTextDemo extends StatelessWidget {
         duration: duration,
         type: type,
         slideType: slideType,
-        textStyle: _style,
+        textStyle: _loremTextStyle,
       ),
     );
   }
